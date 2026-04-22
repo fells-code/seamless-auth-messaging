@@ -1,0 +1,43 @@
+{
+  "name": "seamless-messaging",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Public messaging package system for SeamlessAuth",
+  "author": "Fells Code, LLC",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "npm run build && node --test tests/providers.test.mjs",
+    "typecheck": "tsc -b --pretty false",
+    "clean": "rm -rf packages/*/dist packages/*/tsconfig.tsbuildinfo",
+    "release:verify": "npm run lint && npm run format:check && npm run typecheck && npm test",
+    "publish:core": "npm publish --workspace packages/core --access public",
+    "publish:aws": "npm publish --workspace packages/aws --access public",
+    "publish:twilio": "npm publish --workspace packages/twilio --access public",
+    "publish:packages": "npm run publish:core && npm run publish:aws && npm run publish:twilio"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.8.1",
+    "eslint": "^10.2.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.5.0",
+    "prettier": "^3.8.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.59.0"
+  },
+  "dependencies": {
+    "twilio": "^6.0.0"
+  }
+}

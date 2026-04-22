@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@seamless-auth/messaging": ["packages/core/src/index.ts"],
+      "@seamless-auth/messaging-aws": ["packages/aws/src/index.ts"],
+      "@seamless-auth/messaging-twilio": ["packages/twilio/src/index.ts"]
+    }
+  }
+}

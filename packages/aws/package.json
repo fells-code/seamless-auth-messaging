@@ -1,0 +1,36 @@
+{
+  "name": "@seamless-auth/messaging-aws",
+  "version": "0.1.0",
+  "description": "AWS adapters for SeamlessAuth messaging",
+  "license": "AGPL-3.0-only",
+  "author": "Fells Code, LLC",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ses": "^3.917.0",
+    "@aws-sdk/client-sns": "^3.917.0",
+    "@seamless-auth/messaging": "^0.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
