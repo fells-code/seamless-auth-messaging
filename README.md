@@ -183,6 +183,11 @@ npm run publish:twilio
 
 After that, the repo includes a GitHub Actions workflow that publishes all three packages whenever a GitHub release is published.
 
+The GitHub release tag must match the package version, for example:
+
+- `v0.1.0`
+- `0.1.0`
+
 Required GitHub repository secret:
 
 - `NPM_TOKEN`
