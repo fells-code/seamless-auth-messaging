@@ -18,11 +18,9 @@ It is modeled on the current `seamless-review-api` structure, especially:
 - a local smoke script using fake SES and Twilio clients
 - an environment shape that matches the real use case you care about
 
-## What This Example Does Not Claim Yet
+## Where This Fits
 
-This example does not pretend that `@seamless-auth/express` already accepts a messaging client hook today.
-
-Instead, it gives you the adopter-side module you want ready to plug in when that hook is finalized.
+This example is intentionally focused on the adopter-side messaging module. In the wider SeamlessAuth stack, this pattern is meant to sit behind a server-side integration such as `@seamless-auth/express`.
 
 ## Suggested File Placement In `seamless-review-api`
 

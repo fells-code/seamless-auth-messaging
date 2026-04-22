@@ -2,51 +2,46 @@
 
 ## Release Goal
 
-Ship a realistic `0.1.0` for TypeScript users integrating SeamlessAuth with auth-related messaging.
+Ship and stabilize a realistic `0.1.0` for TypeScript users integrating SeamlessAuth with auth-related messaging.
 
-## Phase 1: Package Skeleton
+## Delivered In `0.1.0`
 
-- create the monorepo package layout
-- add package manifests and TypeScript configs
-- define core public types
-- define provider interfaces
-- choose package names and export boundaries
+- monorepo package layout
+- published core package
+- published AWS transport package
+- published Twilio transport package
+- explicit auth-domain types and service methods
+- default template rendering
+- optional per-flow handlers
+- optional per-flow overrides
+- AWS SES email support
+- AWS SNS SMS support
+- Twilio SMS support
+- mixed-provider composition support
+- workspace lint, format, typecheck, test, and release verification scripts
+- GitHub Actions CI and publish automation
 
-## Phase 2: Core Messaging API
+## Near-Term Stabilization
 
-- implement the provider-agnostic core package
-- add auth-domain input types
-- add message rendering helpers for default templates
-- add normalized delivery result and error types
-- add transport composition for `email` and `sms`
-- add optional custom handlers and message overrides
+- improve the default SeamlessAuth-owned email templates
+- add fuller examples that mirror real adopter apps
+- tighten docs around local development and publish workflows
+- expand automated coverage for override and disabled-transport scenarios
+- keep the public contracts small and steady while the wider SeamlessAuth integrations settle
 
-## Phase 3: AWS Adapter
+## Next Provider/Feature Work
 
-- implement SES email delivery
-- implement SNS SMS delivery
-- validate config up front
-- add tests for each auth flow
-
-## Phase 4: Twilio Adapter
-
-- implement Twilio SMS delivery
-- validate config up front
-- add tests for SMS OTP delivery
-- document mixed-provider setup with AWS email + Twilio SMS
-
-## Phase 5: Integration Example
-
-- add an example or reference integration for `seamless-auth-api`
-- document how to replace the local messaging service implementation
-- document provider selection and environment configuration
+- SendGrid or another email provider
+- richer template customization hooks
+- more framework-specific integration examples
+- better release ergonomics for coordinated version bumps
 
 ## `0.1.0` Definition Of Done
 
 - TypeScript packages publishable to npm
 - official support for AWS email/SMS and Twilio SMS
 - support for the four current SeamlessAuth message flows
-- documented integration path for `seamless-auth-api`
+- documented integration path for SeamlessAuth server-side adapters
 - tests for core logic and provider adapters
 - README and package docs that make setup understandable without reading source
 
@@ -59,4 +54,4 @@ Ship a realistic `0.1.0` for TypeScript users integrating SeamlessAuth with auth
 - Python SDK
 - Rust SDK
 
-The point of `0.1.0` is to prove the package boundary and developer experience first.
+The point of `0.1.0` is to prove the package boundary and developer experience first, then expand carefully from a stable auth-focused core.

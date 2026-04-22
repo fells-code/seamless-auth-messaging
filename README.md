@@ -1,119 +1,123 @@
 # Seamless Messaging
 
-`seamless-messaging` is the public package system for adding email and SMS delivery to SeamlessAuth.
+`seamless-messaging` is the public auth-messaging package family for SeamlessAuth.
 
-The goal is to let SeamlessAuth own auth-message rendering and flow behavior while still giving adopters an easy way to plug in their own delivery clients and providers.
+It gives SeamlessAuth a small, explicit way to deliver auth emails and SMS without forcing adopters to rebuild OTP and magic-link flows themselves. SeamlessAuth owns the auth-message defaults; adopters choose transports, handlers, and optional overrides.
 
-For `0.1.0`, this repository is intentionally scoped to:
+For `0.1.0`, the scope is intentionally narrow:
 
-- TypeScript only
-- official provider support for AWS and Twilio
-- the messaging flows already present in SeamlessAuth
-- a package layout that can grow into more providers and more languages later
+- TypeScript packages only
+- the four auth flows already used by SeamlessAuth
+- AWS SES email
+- AWS SNS SMS
+- Twilio SMS
 
-## Why This Exists
+## Packages
 
-The open-source `seamless-auth-api` already has clear messaging responsibilities, but its current public implementation is a stub.
+- `@seamless-auth/messaging`
+- `@seamless-auth/messaging-aws`
+- `@seamless-auth/messaging-twilio`
 
-Today, the auth server needs to send:
+## What This Repo Solves
 
-- email OTP messages
-- SMS OTP messages
-- magic link emails
-- bootstrap invite emails
+SeamlessAuth needs to send exactly these auth-related messages today:
 
-This repository exists to make those responsibilities portable, explicit, and reusable.
+- email OTP
+- SMS OTP
+- magic link email
+- bootstrap invite email
 
-## Product Goal
+This repo packages that responsibility into:
 
-SeamlessAuth should remain seamless for adopters:
+- a provider-agnostic core service
+- channel transports for `email` and `sms`
+- optional per-flow custom handlers
+- optional message overrides
 
-- auth packages own authentication
-- messaging packages own delivery
-- provider setup should feel obvious and composable
-- the API should not force adopters into one cloud vendor
+It is not a general notification platform or a marketing email system.
 
-## `0.1.0` Scope
+## Public Model
 
-The first release should stay narrow and achievable.
+The intended consumer is a SeamlessAuth server adapter such as `createSeamlessAuthServer(...)`.
 
-### In scope
+At integration time, an adopter should be able to provide:
 
-- a TypeScript-first package system
-- a provider-agnostic core package
-- an AWS adapter for SES and SNS
-- a Twilio adapter for SMS
-- message types/templates for the four current SeamlessAuth auth flows
-- docs and examples for wiring the package into a SeamlessAuth initializer or adopter API integration layer
+- official transports like SES, SNS, and Twilio
+- or custom per-flow handlers if they already own delivery infrastructure
+- plus optional overrides when they want to customize message content
 
-### Not in scope
+The core service keeps the auth-domain API small:
 
-- non-TypeScript SDKs
-- a generic marketing-email platform
-- dashboard features or hosted delivery management
-- dozens of providers at launch
-- a fully generalized cross-language spec before the TypeScript package is proven
+- `sendOtpEmail(...)`
+- `sendOtpSms(...)`
+- `sendMagicLinkEmail(...)`
+- `sendBootstrapInviteEmail(...)`
 
-## Important Constraint
+## Install
 
-Twilio can cover SMS, but it does not cover the email flows needed by SeamlessAuth by itself.
-
-That means `0.1.0` should support provider composition by channel:
-
-- AWS for email and SMS
-- AWS for email plus Twilio for SMS
-
-Future providers such as SendGrid can fill the email side later without forcing a redesign.
-
-## Proposed Package Direction
-
-The repo should grow into a small package family, similar to how SeamlessAuth already separates core logic from framework adapters.
-
-Planned package shape:
-
-```text
-packages/
-  core/      provider-agnostic contracts, templates, types, errors
-  aws/       AWS SES + SNS adapter
-  twilio/    Twilio SMS adapter
+```bash
+npm install @seamless-auth/messaging
+npm install @seamless-auth/messaging-aws
+npm install @seamless-auth/messaging-twilio
 ```
 
-This keeps the public API stable while letting provider packages evolve independently.
+Install only the provider packages you need.
 
-## Proposed Integration Model
-
-The intended integration target is a SeamlessAuth initializer such as `createSeamlessAuthServer(...)`.
-
-Adopters should be able to pass:
-
-- official email and SMS transports
-- or custom auth-message handlers
-- plus optional message overrides when they need them
-
-SeamlessAuth should then own the default auth-message behavior on top of those transports.
-
-At a high level:
+## Quick Start
 
 ```ts
-const messaging = createAuthMessagingService({
-  appName: "My App",
-  email: createAwsEmailTransport(...),
-  sms: createTwilioSmsTransport(...),
-  overrides: {
-    otpSms: ({ appName, token }, defaults) => ({
-      ...defaults,
-      body: `Your ${appName} code is ${token}`,
-    }),
-  },
+import { createAuthMessagingService } from "@seamless-auth/messaging";
+import { createAwsEmailTransport } from "@seamless-auth/messaging-aws";
+import { createTwilioSmsTransport } from "@seamless-auth/messaging-twilio";
+
+const authMessaging = createAuthMessagingService({
+  appName: "Seamless Review",
+  email: createAwsEmailTransport({
+    region: process.env.AWS_REGION!,
+    fromEmail: process.env.AUTH_EMAIL_FROM!,
+  }),
+  sms: createTwilioSmsTransport({
+    accountSid: process.env.TWILIO_ACCOUNT_SID!,
+    authToken: process.env.TWILIO_AUTH_TOKEN!,
+    fromNumber: process.env.TWILIO_FROM_NUMBER!,
+  }),
 });
 
-await messaging.sendOtpEmail({ ... });
-await messaging.sendOtpSms({ ... });
-await messaging.sendMagicLinkEmail({ ... });
-await messaging.sendBootstrapInviteEmail({ ... });
+await authMessaging.sendOtpEmail({
+  to: "user@example.com",
+  token: "ABCDEF",
+});
+
+await authMessaging.sendOtpSms({
+  to: "+15551234567",
+  token: 123456,
+});
 ```
 
-The package should expose auth-focused operations and transport interfaces, not just raw provider wrappers.
+## Why Channel Composition Matters
+
+Twilio covers SMS, but not the email flows SeamlessAuth needs for launch.
+
+So `0.1.0` is deliberately channel-based:
+
+- AWS email + AWS SMS
+- AWS email + Twilio SMS
+- custom email handler + Twilio SMS
+
+That keeps the core contract stable as future providers like SendGrid or Resend are added later.
+
+## Current Status
+
+This repo is no longer just a design sketch. It currently includes:
+
+- the published core package
+- published AWS email and SMS transports
+- a published Twilio SMS transport
+- default auth-message rendering
+- handler and override support in the core service
+- tests covering mixed-provider composition
+
+This package family has also already been used to support a real SeamlessAuth integration path in the wider ecosystem.
 
 ## Documentation
 
@@ -125,36 +129,27 @@ The package should expose auth-focused operations and transport interfaces, not 
 
 ## Examples
 
-- [Seamless Review API adopter example](./examples/seamless-review-api/README.md)
+- [Seamless Review API example](./examples/seamless-review-api/README.md)
 
-## Relationship To SeamlessAuth Repositories
+## Relationship To SeamlessAuth
 
-This repo is being designed against:
+This repo was shaped by reviewing and integrating against:
 
-- the internal historical implementation in `seamless-auth-api-internal`
-- the current public `seamless-auth-api`
-- the packaging style established in `seamless-auth-server`
+- `seamless-auth-api-internal`
+- `seamless-auth-api`
+- `seamless-auth-server`
 
-That review suggests the right approach is:
+That work pushed the design toward:
 
 - small public packages
-- explicit contracts
-- composable adapters
-- narrow responsibilities per package
-
-## Current Status
-
-This repository now contains the first transport-based implementation for:
-
-- AWS SES email
-- AWS SNS SMS
-- Twilio SMS
-
-The next step is to let the SeamlessAuth server packages consume this transport model directly.
+- explicit typed contracts
+- thin provider adapters
+- auth-focused defaults
+- adopter-controlled transport choice
 
 ## Development
 
-Use the workspace scripts at the repo root while iterating on the packages:
+Use the workspace scripts at the repo root while iterating:
 
 ```bash
 npm run lint
@@ -163,7 +158,7 @@ npm run typecheck
 npm test
 ```
 
-If you want to rewrite formatting or fix lint issues automatically:
+Auto-fix helpers:
 
 ```bash
 npm run format
@@ -172,7 +167,7 @@ npm run lint:fix
 
 ## Publishing
 
-The first release can be published manually from the workspace after verification:
+Publish manually after verification:
 
 ```bash
 npm run release:verify
@@ -181,18 +176,18 @@ npm run publish:aws
 npm run publish:twilio
 ```
 
-After that, the repo includes a GitHub Actions workflow that publishes all three packages whenever a GitHub release is published.
+The repo also includes GitHub Actions publish automation for GitHub Releases.
 
-The GitHub release tag must match the package version, for example:
+The release tag must match the package version, for example:
 
 - `v0.1.0`
 - `0.1.0`
 
-Required GitHub repository secret:
+Required GitHub secret:
 
 - `NPM_TOKEN`
 
-The publish order is:
+Publish order:
 
 1. `@seamless-auth/messaging`
 2. `@seamless-auth/messaging-aws`

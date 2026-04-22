@@ -2,7 +2,7 @@
 
 AWS transport adapters for SeamlessAuth messaging.
 
-Planned `0.1.0` coverage:
+`0.1.0` coverage:
 
 - SES for email delivery
 - SNS for SMS delivery

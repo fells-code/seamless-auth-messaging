@@ -2,90 +2,87 @@
 
 ## Target Adopter
 
-The most realistic near-term adopter story is `seamless-review-api`.
+The clearest first adopter story is an API like `seamless-review-api`.
 
-That app already:
+That kind of app already:
 
 - mounts `@seamless-auth/express` in its API server
 - owns the application-level SeamlessAuth connection
-- already sends transactional email through AWS SES
-- has app-level environment/config parsing
+- owns provider credentials and config parsing
+- may already send operational or transactional email elsewhere in the app
 
-That makes it a strong proving ground for this package family.
+That makes it the right proving ground for this package family.
 
 ## What The Adopter Wants
 
 An adopter team should be able to say:
 
 1. We use SeamlessAuth for passwordless auth.
-2. We want auth-related messaging to be configured in our own API.
+2. We want auth-related delivery configured in our own API.
 3. We want SES for email and Twilio for SMS.
-4. We want to pass those delivery capabilities into SeamlessAuth instead of rebuilding auth messaging ourselves.
+4. We want to pass those delivery capabilities into SeamlessAuth instead of rebuilding auth flows ourselves.
 
 That is the core user story this repo should serve.
-
-## Current Reality In `seamless-review-api`
-
-Today the review API already has two useful integration anchors:
-
-- `src/app.ts` owns the `createSeamlessAuthServer(...)` setup
-- `src/lib/email/sendEmail.ts` owns existing SES email delivery patterns
-
-Those files suggest the right adopter-side shape:
-
-- auth connection setup stays in the adopter API
-- messaging provider selection stays in the adopter API
-- this package supplies auth-focused messaging primitives
 
 ## Desired Adopter Flow
 
 The intended flow is:
 
 1. The adopter parses auth messaging config from its environment.
-2. The adopter creates official transports or passes custom handlers:
+2. The adopter creates official transports or custom handlers:
    - SES for email
    - Twilio for SMS
-3. The adopter passes those capabilities into a SeamlessAuth initializer.
+3. The adopter passes those capabilities into a SeamlessAuth initializer or adjacent server adapter.
 4. SeamlessAuth-owned auth flows call the messaging service for:
    - OTP email
    - OTP SMS
    - magic link email
    - bootstrap invite email
+5. SeamlessAuth delivers a good default experience without forcing the adopter to own message rendering.
 
-## Honest Current Gap
+## Why This Model Works
 
-Today, `@seamless-auth/express` does not yet accept a messaging service or transport config as part of `createSeamlessAuthServer(...)`.
+- Adopters keep control over credentials and providers
+- SeamlessAuth keeps control over auth semantics and default templates
+- Provider packages stay small and predictable
+- Mixed-provider setups like AWS email plus Twilio SMS work naturally
 
-So the package work in this repository should currently optimize for:
+## Expected Integrator Responsibilities
 
-- a strong adopter-owned messaging client
-- clean provider configuration
-- realistic examples
-- local smoke testing
+Integrators should usually own:
 
-The final end-to-end hook into the SeamlessAuth connection layer is a separate integration step.
+- environment/config loading
+- provider client construction
+- sender identity values like `fromEmail` or `fromNumber`
+- any app-specific audit logging around auth delivery
 
-## Why `seamless-review-api` Is The Right First Example
+SeamlessAuth should usually own:
 
-It is already close to the desired production shape:
+- default auth templates
+- auth-domain message methods
+- per-flow override hooks
+- the point where auth routes decide which message to send
 
-- app-owned auth connection
+## Why `seamless-review-api` Is Still The Right Example
+
+It mirrors the real shape this repo is designed for:
+
+- app-owned auth server setup
 - app-owned config
-- existing AWS SES operational context
-- real Express API
-- real local development flow
-
-Using it as the reference keeps the examples honest and keeps this package focused on what adopters actually need to do.
+- adopter-selected messaging vendors
+- a real local development loop
+- a realistic production deployment path
 
 ## Local Testing Story
 
-For the first local testing loop, the adopter should not need a full auth-server rewrite.
+The first local testing loop should stay simple.
 
-A practical testing ladder is:
+A practical ladder is:
 
 1. Build a real adopter-side messaging factory.
 2. Smoke test those transports and handlers locally with fake clients.
 3. Verify real SES and Twilio credentials in a controlled dev environment.
-4. Only after that, wire the messaging service into the SeamlessAuth initializer.
+4. Add dev-only logging or disabled transports where helpful for local DX.
+5. Wire the service into a SeamlessAuth server integration.
 
-This keeps the package verifiable now, while leaving room for the final SeamlessAuth integration point to evolve cleanly.
+That keeps the package easy to adopt without forcing a large auth-server rewrite first.

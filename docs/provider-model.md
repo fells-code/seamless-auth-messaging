@@ -12,8 +12,8 @@ The provider model should separate:
 
 ## `0.1.0` Provider Rules
 
-- AWS is the full-coverage provider for launch
-- Twilio is an SMS provider for launch
+- AWS is the full-coverage launch provider
+- Twilio is an SMS launch provider
 - email and SMS should be configurable independently
 - the core package should not assume one provider owns every channel
 - custom handlers should remain a supported escape hatch
@@ -29,9 +29,9 @@ The provider model should separate:
 
 This is why a channel-based composition model is safer than a single `provider: "aws" | "twilio"` switch.
 
-## Recommended Core Contracts
+## Core Contracts
 
-The implementation can vary, but the package system should end up with concepts close to these:
+The package system is built around concepts like these:
 
 ```ts
 export interface EmailTransport {
@@ -57,7 +57,7 @@ export interface AuthMessagingService {
 }
 ```
 
-The important part is not the exact names. The important part is:
+The important parts are:
 
 - auth-domain operations at the top
 - channel transports underneath
@@ -66,7 +66,7 @@ The important part is not the exact names. The important part is:
 
 ## Configuration Direction
 
-The package should prefer explicit object configuration over hidden environment reads.
+The package prefers explicit object configuration over hidden environment reads.
 
 Recommended style:
 
@@ -80,7 +80,7 @@ const messaging = createAuthMessagingService({
   sms: createTwilioSmsTransport({
     accountSid: process.env.TWILIO_ACCOUNT_SID!,
     authToken: process.env.TWILIO_AUTH_TOKEN!,
-    fromNumber: process.env.TWILIO_PHONE_NUMBER!,
+    fromNumber: process.env.TWILIO_FROM_NUMBER!,
   }),
 });
 ```
@@ -89,20 +89,25 @@ This matches the broader SeamlessAuth preference for explicit integration over m
 
 ## Template Strategy
 
-For launch, each auth-domain method should render a sensible default message.
+Each auth-domain method ships with a sensible default message.
 
-Examples:
+Today that means:
 
 - OTP email subject/body
 - OTP SMS body
 - magic link email subject/body
 - bootstrap invite email subject/body
 
-Transports should deliver rendered content, not own business logic for auth messaging.
+Transports deliver rendered content. They do not own auth business logic.
+
+Integrators can customize that behavior in two ways:
+
+- override message rendering for a specific auth flow
+- replace a specific auth flow with a custom handler
 
 ## Error Model
 
-The package should normalize provider failures into a small set of useful categories:
+The package normalizes provider failures into a small set of useful categories:
 
 - configuration error
 - transport error
@@ -120,7 +125,7 @@ Likely future connectors:
 - Resend
 - Postmark
 
-The package should be ready for those by:
+The current design leaves room for those by:
 
 - keeping email transport APIs independent from SMS transport APIs
 - avoiding provider enums baked into the core domain

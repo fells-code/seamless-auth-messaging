@@ -2,7 +2,7 @@
 
 Twilio SMS transport adapter for SeamlessAuth messaging.
 
-Planned `0.1.0` coverage:
+`0.1.0` coverage:
 
 - Twilio Programmable SMS for OTP delivery
 
