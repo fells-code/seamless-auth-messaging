@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=24 <25"
   },
   "scripts": {
     "build": "tsc -b",
