@@ -7,7 +7,7 @@ It gives SeamlessAuth a small, explicit way to deliver auth emails and SMS witho
 For `0.1.0`, the scope is intentionally narrow:
 
 - TypeScript packages only
-- the four auth flows already used by SeamlessAuth
+- the three auth flows already used by SeamlessAuth
 - AWS SES email
 - AWS SNS SMS
 - Twilio SMS
@@ -25,7 +25,6 @@ SeamlessAuth needs to send exactly these auth-related messages today:
 - email OTP
 - SMS OTP
 - magic link email
-- bootstrap invite email
 
 This repo packages that responsibility into:
 
@@ -51,7 +50,6 @@ The core service keeps the auth-domain API small:
 - `sendOtpEmail(...)`
 - `sendOtpSms(...)`
 - `sendMagicLinkEmail(...)`
-- `sendBootstrapInviteEmail(...)`
 
 ## Install
 

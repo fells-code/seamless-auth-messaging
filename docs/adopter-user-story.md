@@ -37,7 +37,6 @@ The intended flow is:
    - OTP email
    - OTP SMS
    - magic link email
-   - bootstrap invite email
 5. SeamlessAuth delivers a good default experience without forcing the adopter to own message rendering.
 
 ## Why This Model Works

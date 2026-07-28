@@ -40,7 +40,7 @@ Ship and stabilize a realistic `0.1.0` for TypeScript users integrating Seamless
 
 - TypeScript packages publishable to npm
 - official support for AWS email/SMS and Twilio SMS
-- support for the four current SeamlessAuth message flows
+- support for the three current SeamlessAuth message flows
 - documented integration path for SeamlessAuth server-side adapters
 - tests for core logic and provider adapters
 - README and package docs that make setup understandable without reading source

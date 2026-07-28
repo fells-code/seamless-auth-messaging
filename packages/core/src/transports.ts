@@ -1,9 +1,4 @@
-import type {
-  SendBootstrapInviteEmailInput,
-  SendMagicLinkEmailInput,
-  SendOtpEmailInput,
-  SendOtpSmsInput,
-} from "./messages.js";
+import type { SendMagicLinkEmailInput, SendOtpEmailInput, SendOtpSmsInput } from "./messages.js";
 import type { DeliveryResult, EmailMessage, SmsMessage } from "./types.js";
 
 export interface EmailTransport {
@@ -20,7 +15,6 @@ export interface AuthMessagingHandlers {
   sendOtpEmail(input: SendOtpEmailInput): Promise<DeliveryResult>;
   sendOtpSms(input: SendOtpSmsInput): Promise<DeliveryResult>;
   sendMagicLinkEmail(input: SendMagicLinkEmailInput): Promise<DeliveryResult>;
-  sendBootstrapInviteEmail(input: SendBootstrapInviteEmailInput): Promise<DeliveryResult>;
 }
 
 export interface AuthMessageOverrideContext {
@@ -43,18 +37,12 @@ export interface AuthMessageOverrides {
     defaults: EmailMessage,
     context: AuthMessageOverrideContext,
   ) => EmailMessage;
-  bootstrapInviteEmail?: (
-    input: SendBootstrapInviteEmailInput,
-    defaults: EmailMessage,
-    context: AuthMessageOverrideContext,
-  ) => EmailMessage;
 }
 
 export interface AuthMessagingService {
   sendOtpEmail(input: SendOtpEmailInput): Promise<DeliveryResult>;
   sendOtpSms(input: SendOtpSmsInput): Promise<DeliveryResult>;
   sendMagicLinkEmail(input: SendMagicLinkEmailInput): Promise<DeliveryResult>;
-  sendBootstrapInviteEmail(input: SendBootstrapInviteEmailInput): Promise<DeliveryResult>;
 }
 
 export type EmailProvider = EmailTransport;

@@ -48,11 +48,6 @@ async function main() {
     to: "reviewer@example.com",
     magicLinkUrl: "https://review.example.com/verify-magic-link?token=xyz",
   });
-
-  await authMessaging.sendBootstrapInviteEmail({
-    to: "admin@example.com",
-    inviteUrl: "https://review.example.com/login?bootstrapToken=bootstrap-token",
-  });
 }
 
 void main();
