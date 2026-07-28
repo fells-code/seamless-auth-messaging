@@ -6,12 +6,11 @@ Provide a public auth-messaging package system for SeamlessAuth that sits behind
 
 ## Product Boundary
 
-SeamlessAuth currently needs messaging support for four auth workflows:
+SeamlessAuth currently needs messaging support for three auth workflows:
 
 - OTP email
 - OTP SMS
 - magic link email
-- bootstrap invite email
 
 That is the right boundary for this repo. It should stay focused on auth delivery, not expand into a generic notification platform.
 
@@ -112,7 +111,6 @@ Public operations:
 - `sendOtpEmail`
 - `sendOtpSms`
 - `sendMagicLinkEmail`
-- `sendBootstrapInviteEmail`
 
 This keeps the API aligned with current SeamlessAuth responsibilities.
 

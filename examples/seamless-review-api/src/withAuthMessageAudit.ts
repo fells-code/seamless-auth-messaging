@@ -1,6 +1,5 @@
 import type {
   MessagingClient,
-  SendBootstrapInviteEmailInput,
   SendMagicLinkEmailInput,
   SendOtpEmailInput,
   SendOtpSmsInput,
@@ -32,15 +31,7 @@ export type AuthMessageAuditEntry =
       messageId?: string;
     }
   | {
-      operation: "sendBootstrapInviteEmail";
-      status: "sent";
-      to: string;
-      provider: string;
-      channel: "email" | "sms";
-      messageId?: string;
-    }
-  | {
-      operation: "sendOtpEmail" | "sendOtpSms" | "sendMagicLinkEmail" | "sendBootstrapInviteEmail";
+      operation: "sendOtpEmail" | "sendOtpSms" | "sendMagicLinkEmail";
       status: "failed";
       to: string;
       error: unknown;
@@ -112,17 +103,6 @@ export function withAuthMessageAudit(
         return result;
       } catch (error) {
         await auditFailure(audit, "sendMagicLinkEmail", input.to, error);
-        throw error;
-      }
-    },
-
-    async sendBootstrapInviteEmail(input: SendBootstrapInviteEmailInput) {
-      try {
-        const result = await messaging.sendBootstrapInviteEmail(input);
-        await auditSuccess(audit, "sendBootstrapInviteEmail", input.to, result);
-        return result;
-      } catch (error) {
-        await auditFailure(audit, "sendBootstrapInviteEmail", input.to, error);
         throw error;
       }
     },

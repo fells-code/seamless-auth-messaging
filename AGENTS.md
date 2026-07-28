@@ -62,7 +62,6 @@ The auth server currently needs messaging support for exactly these flows:
 - email OTP
 - SMS OTP
 - magic link email
-- bootstrap invite email
 
 Treat those as the primary domain API for `0.1.0`.
 
@@ -106,7 +105,7 @@ Keep the first release intentionally narrow.
 - a provider-agnostic core package
 - AWS email and SMS support
 - Twilio SMS support
-- the four auth flows already used by SeamlessAuth
+- the three auth flows already used by SeamlessAuth
 - docs and examples that show how an adopter API should consume the package
 
 ### Out of scope
@@ -133,7 +132,6 @@ Bias toward APIs that would let the auth server keep call sites similar to:
 - `sendOtpEmail(...)`
 - `sendOtpSms(...)`
 - `sendMagicLinkEmail(...)`
-- `sendBootstrapInviteEmail(...)`
 
 ## Style Guidance
 

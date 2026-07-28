@@ -18,10 +18,3 @@ export interface SendMagicLinkEmailInput {
   from?: string;
   subject?: string;
 }
-
-export interface SendBootstrapInviteEmailInput {
-  to: string;
-  inviteUrl: string;
-  from?: string;
-  subject?: string;
-}

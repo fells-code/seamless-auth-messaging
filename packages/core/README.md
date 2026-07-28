@@ -7,7 +7,6 @@ This package owns the shared messaging contracts and the auth-focused service su
 - OTP email
 - OTP SMS
 - magic link email
-- bootstrap invite email
 
 It exposes:
 

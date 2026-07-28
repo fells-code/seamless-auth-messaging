@@ -20,12 +20,11 @@ The provider model should separate:
 
 ## Launch Matrix
 
-| Flow             | Channel | AWS | Twilio |
-| ---------------- | ------- | --- | ------ |
-| Email OTP        | Email   | Yes | No     |
-| SMS OTP          | SMS     | Yes | Yes    |
-| Magic link       | Email   | Yes | No     |
-| Bootstrap invite | Email   | Yes | No     |
+| Flow       | Channel | AWS | Twilio |
+| ---------- | ------- | --- | ------ |
+| Email OTP  | Email   | Yes | No     |
+| SMS OTP    | SMS     | Yes | Yes    |
+| Magic link | Email   | Yes | No     |
 
 This is why a channel-based composition model is safer than a single `provider: "aws" | "twilio"` switch.
 
@@ -46,14 +45,12 @@ export interface AuthMessagingHandlers {
   sendOtpEmail?: (input: SendOtpEmailInput) => Promise<DeliveryResult>;
   sendOtpSms?: (input: SendOtpSmsInput) => Promise<DeliveryResult>;
   sendMagicLinkEmail?: (input: SendMagicLinkEmailInput) => Promise<DeliveryResult>;
-  sendBootstrapInviteEmail?: (input: SendBootstrapInviteEmailInput) => Promise<DeliveryResult>;
 }
 
 export interface AuthMessagingService {
   sendOtpEmail(input: SendOtpEmailInput): Promise<DeliveryResult>;
   sendOtpSms(input: SendOtpSmsInput): Promise<DeliveryResult>;
   sendMagicLinkEmail(input: SendMagicLinkEmailInput): Promise<DeliveryResult>;
-  sendBootstrapInviteEmail(input: SendBootstrapInviteEmailInput): Promise<DeliveryResult>;
 }
 ```
 
@@ -96,7 +93,6 @@ Today that means:
 - OTP email subject/body
 - OTP SMS body
 - magic link email subject/body
-- bootstrap invite email subject/body
 
 Transports deliver rendered content. They do not own auth business logic.
 

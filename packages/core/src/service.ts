@@ -69,25 +69,6 @@ function buildMagicLinkHtml(appName: string, magicLinkUrl: string): string {
   ].join("\n");
 }
 
-function buildBootstrapInviteText(appName: string, inviteUrl: string): string {
-  return [
-    `You have been invited to bootstrap ${appName}.`,
-    "",
-    "Use the link below to continue:",
-    inviteUrl,
-  ].join("\n");
-}
-
-function buildBootstrapInviteHtml(appName: string, inviteUrl: string): string {
-  return [
-    "<div>",
-    `  <h1>Bootstrap invite for ${appName}</h1>`,
-    "  <p>Use the link below to continue:</p>",
-    `  <p><a href="${inviteUrl}">${inviteUrl}</a></p>`,
-    "</div>",
-  ].join("\n");
-}
-
 function buildOtpSmsText(appName: string, token: string | number): string {
   return `Your ${appName} verification code is: ${token}. No one will ever ask you for this code. Do not share it.`;
 }
@@ -201,34 +182,6 @@ export function createAuthMessagingService(
           subject: input.subject ?? `${appName} - Your sign-in link`,
           text: buildMagicLinkText(appName, input.magicLinkUrl),
           html: buildMagicLinkHtml(appName, input.magicLinkUrl),
-        },
-        context,
-      );
-
-      return email.send(message);
-    },
-
-    async sendBootstrapInviteEmail(input) {
-      if (handlers?.sendBootstrapInviteEmail) {
-        return handlers.sendBootstrapInviteEmail(input);
-      }
-
-      if (!email) {
-        throw new UnsupportedChannelError("email");
-      }
-
-      assertLikelyEmail(input.to, "input.to");
-      assertLikelyUrl(input.inviteUrl, "input.inviteUrl");
-
-      const message = applyEmailOverride(
-        overrides?.bootstrapInviteEmail,
-        input,
-        {
-          to: input.to,
-          from: input.from ?? defaults?.emailFrom,
-          subject: input.subject ?? `${appName} - Bootstrap invite`,
-          text: buildBootstrapInviteText(appName, input.inviteUrl),
-          html: buildBootstrapInviteHtml(appName, input.inviteUrl),
         },
         context,
       );
