@@ -2,7 +2,7 @@
   "name": "@seamless-auth/messaging",
   "version": "0.1.0",
   "description": "Provider-agnostic messaging core for SeamlessAuth",
-  "license": "AGPL-3.0-only",
+  "license": "Apache-2.0",
   "author": "Fells Code, LLC",
   "sideEffects": false,
   "type": "module",
