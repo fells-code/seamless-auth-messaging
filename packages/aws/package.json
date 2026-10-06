@@ -1,6 +1,6 @@
 {
   "name": "@seamless-auth/messaging-aws",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AWS adapters for SeamlessAuth messaging",
   "license": "Apache-2.0",
   "author": "Fells Code, LLC",
@@ -28,7 +28,7 @@
   "dependencies": {
     "@aws-sdk/client-ses": "^3.917.0",
     "@aws-sdk/client-sns": "^3.917.0",
-    "@seamless-auth/messaging": "^0.1.0"
+    "@seamless-auth/messaging": "^0.2.0"
   },
   "publishConfig": {
     "access": "public"

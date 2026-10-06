@@ -1,6 +1,6 @@
 {
   "name": "@seamless-auth/messaging",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Provider-agnostic messaging core for SeamlessAuth",
   "license": "Apache-2.0",
   "author": "Fells Code, LLC",
