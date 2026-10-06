@@ -2,7 +2,7 @@
   "name": "@seamless-auth/messaging-twilio",
   "version": "0.1.0",
   "description": "Twilio SMS adapter for SeamlessAuth messaging",
-  "license": "AGPL-3.0-only",
+  "license": "Apache-2.0",
   "author": "Fells Code, LLC",
   "sideEffects": false,
   "type": "module",
