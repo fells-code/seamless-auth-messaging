@@ -260,3 +260,79 @@ test("Message overrides can customize built-in templates without replacing trans
 
   assert.equal(capturedInput.body, "[Seamless Demo] code=444111");
 });
+
+function sesCapture(delivered) {
+  return createAwsEmailTransport({
+    region: "us-east-1",
+    fromEmail: "noreply@example.com",
+    sesClient: {
+      async send(command) {
+        delivered.push(command.input);
+        return { MessageId: "ses-invite" };
+      },
+    },
+  });
+}
+
+test("Enrollment invites link to the sign-in page", async () => {
+  const delivered = [];
+  const messaging = createAuthMessagingService({
+    appName: "Seamless Demo",
+    email: sesCapture(delivered),
+  });
+
+  const result = await messaging.sendEnrollmentInviteEmail({
+    to: "user@example.com",
+    signInUrl: "https://app.example.com/login",
+  });
+
+  assert.equal(result.provider, "aws-ses");
+  assert.match(delivered[0].Message.Subject.Data, /add a passkey/i);
+  assert.match(delivered[0].Message.Body.Text.Data, /https:\/\/app\.example\.com\/login/);
+  assert.match(delivered[0].Message.Body.Html.Data, /href="https:\/\/app\.example\.com\/login"/);
+});
+
+test("Enrollment invites honour a custom handler and an override", async () => {
+  const handled = [];
+  const viaHandler = createAuthMessagingService({
+    appName: "Seamless Demo",
+    handlers: {
+      async sendEnrollmentInviteEmail(input) {
+        handled.push(input);
+        return { accepted: true, provider: "custom", channel: "email", messageId: "c-1" };
+      },
+    },
+  });
+  await viaHandler.sendEnrollmentInviteEmail({
+    to: "user@example.com",
+    signInUrl: "https://app.example.com/login",
+  });
+  assert.equal(handled[0].signInUrl, "https://app.example.com/login");
+
+  const delivered = [];
+  const viaOverride = createAuthMessagingService({
+    appName: "Seamless Demo",
+    email: sesCapture(delivered),
+    overrides: {
+      enrollmentInviteEmail(input, defaults, context) {
+        return { ...defaults, subject: `[${context.appName}] passkeys for ${input.to}` };
+      },
+    },
+  });
+  await viaOverride.sendEnrollmentInviteEmail({
+    to: "user@example.com",
+    signInUrl: "https://app.example.com/login",
+  });
+  assert.equal(delivered[0].Message.Subject.Data, "[Seamless Demo] passkeys for user@example.com");
+});
+
+test("Enrollment invites reject a sign-in URL that is not a URL", async () => {
+  const messaging = createAuthMessagingService({
+    appName: "Seamless Demo",
+    email: sesCapture([]),
+  });
+
+  await assert.rejects(
+    messaging.sendEnrollmentInviteEmail({ to: "user@example.com", signInUrl: "not a url" }),
+  );
+});

@@ -50,6 +50,7 @@ The core service keeps the auth-domain API small:
 - `sendOtpEmail(...)`
 - `sendOtpSms(...)`
 - `sendMagicLinkEmail(...)`
+- `sendEnrollmentInviteEmail(...)`: asks a user to sign in and add a passkey; the link opens the sign-in page and carries no credential
 
 ## Install
 

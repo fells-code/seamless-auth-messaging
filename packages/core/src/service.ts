@@ -69,6 +69,30 @@ function buildMagicLinkHtml(appName: string, magicLinkUrl: string): string {
   ].join("\n");
 }
 
+function buildEnrollmentInviteText(appName: string, signInUrl: string): string {
+  return [
+    `${appName} is moving sign-in to passkeys.`,
+    "",
+    "Sign in at the link below and you will be asked to add a passkey, which lets you sign in",
+    "with your device's screen lock or a security key instead of a password or code:",
+    "",
+    signInUrl,
+    "",
+    "This link only opens the sign-in page. If you were not expecting this, you can ignore it.",
+  ].join("\n");
+}
+
+function buildEnrollmentInviteHtml(appName: string, signInUrl: string): string {
+  return [
+    "<div>",
+    `  <h1>Add a passkey to your ${appName} account</h1>`,
+    `  <p>${appName} is moving sign-in to passkeys. Sign in at the link below and you will be asked to add one, so you can sign in with your device's screen lock or a security key.</p>`,
+    `  <p><a href="${signInUrl}">${signInUrl}</a></p>`,
+    "  <p>This link only opens the sign-in page. If you were not expecting this, you can ignore it.</p>",
+    "</div>",
+  ].join("\n");
+}
+
 function buildOtpSmsText(appName: string, token: string | number): string {
   return `Your ${appName} verification code is: ${token}. No one will ever ask you for this code. Do not share it.`;
 }
@@ -182,6 +206,34 @@ export function createAuthMessagingService(
           subject: input.subject ?? `${appName} - Your sign-in link`,
           text: buildMagicLinkText(appName, input.magicLinkUrl),
           html: buildMagicLinkHtml(appName, input.magicLinkUrl),
+        },
+        context,
+      );
+
+      return email.send(message);
+    },
+
+    async sendEnrollmentInviteEmail(input) {
+      if (handlers?.sendEnrollmentInviteEmail) {
+        return handlers.sendEnrollmentInviteEmail(input);
+      }
+
+      if (!email) {
+        throw new UnsupportedChannelError("email");
+      }
+
+      assertLikelyEmail(input.to, "input.to");
+      assertLikelyUrl(input.signInUrl, "input.signInUrl");
+
+      const message = applyEmailOverride(
+        overrides?.enrollmentInviteEmail,
+        input,
+        {
+          to: input.to,
+          from: input.from ?? defaults?.emailFrom,
+          subject: input.subject ?? `${appName} - Add a passkey to your account`,
+          text: buildEnrollmentInviteText(appName, input.signInUrl),
+          html: buildEnrollmentInviteHtml(appName, input.signInUrl),
         },
         context,
       );
