@@ -11,6 +11,7 @@ This package owns the shared messaging contracts and the auth-focused service su
 - OTP email
 - OTP SMS
 - magic link email
+- passkey enrollment invite email (`sendEnrollmentInviteEmail(...)`)
 
 It exposes:
 

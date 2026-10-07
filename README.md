@@ -4,10 +4,10 @@
 
 It gives SeamlessAuth a small, explicit way to deliver auth emails and SMS without forcing adopters to rebuild OTP and magic-link flows themselves. SeamlessAuth owns the auth-message defaults; adopters choose transports, handlers, and optional overrides.
 
-For `0.1.0`, the scope is intentionally narrow:
+Current scope is intentionally narrow:
 
 - TypeScript packages only
-- the three auth flows already used by SeamlessAuth
+- the four auth flows SeamlessAuth sends today: email OTP, SMS OTP, magic link email, and passkey enrollment invite email
 - AWS SES email
 - AWS SNS SMS
 - Twilio SMS
@@ -44,6 +44,7 @@ SeamlessAuth needs to send exactly these auth-related messages today:
 - email OTP
 - SMS OTP
 - magic link email
+- passkey enrollment invite email
 
 This repo packages that responsibility into:
 
@@ -56,7 +57,7 @@ It is not a general notification platform or a marketing email system.
 
 ## Public Model
 
-The intended consumer is a SeamlessAuth server adapter such as `createSeamlessAuthServer(...)`.
+The consumer is `seamless-auth-api`, which builds its messaging service from these packages with `createAuthMessagingService(...)` and the AWS and Twilio transports. The `seamless-auth-server` adapters do not depend on these packages.
 
 At integration time, an adopter should be able to provide:
 
@@ -116,7 +117,7 @@ await authMessaging.sendOtpSms({
 
 Twilio covers SMS, but not the email flows SeamlessAuth needs for launch.
 
-So `0.1.0` is deliberately channel-based:
+So the package family is deliberately channel-based:
 
 - AWS email + AWS SMS
 - AWS email + Twilio SMS
@@ -153,7 +154,6 @@ This package family has also already been used to support a real SeamlessAuth in
 
 This repo was shaped by reviewing and integrating against:
 
-- `seamless-auth-api-internal`
 - `seamless-auth-api`
 - `seamless-auth-server`
 
