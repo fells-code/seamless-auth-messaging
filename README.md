@@ -12,6 +12,25 @@ For `0.1.0`, the scope is intentionally narrow:
 - AWS SNS SMS
 - Twilio SMS
 
+## Start here
+
+New to Seamless Auth? The [self-hosted quickstart](https://docs.seamlessauth.com/start/quickstart/) runs the full stack locally with Docker. If Seamless hosts your auth instance, follow the [managed quickstart](https://docs.seamlessauth.com/start/managed-quickstart/) instead.
+
+These packages are how `seamless-auth-api` delivers OTP and magic link email and SMS, so they attach to the API node in the diagram below.
+
+```mermaid
+flowchart LR
+  browser["Browser<br/>@seamless-auth/react"] -- "signed httpOnly cookies" --> backend
+  native["Native app<br/>@seamless-auth/react-native"] -- "bearer tokens" --> backend
+  backend["Your backend<br/>@seamless-auth/express, fastify, or nextjs<br/>mounted at /auth"] -- "bearer token + service token" --> api
+  api["seamless-auth-api<br/>owns the session"] --> db[("Postgres")]
+  backend -. "verifies tokens with JWKS" .-> api
+  api -. "sends email and SMS" .-> messaging["@seamless-auth/messaging<br/>plus -aws and -twilio transports"]
+  style messaging stroke-width:3px
+```
+
+[How the pieces connect](https://docs.seamlessauth.com/start/overview/#how-the-pieces-connect) explains each hop. [Compatibility matrix](https://docs.seamlessauth.com/build/ecosystem/#compatibility-matrix) lists which package versions work together.
+
 ## Packages
 
 - `@seamless-auth/messaging`
