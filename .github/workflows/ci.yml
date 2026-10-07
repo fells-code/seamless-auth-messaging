@@ -8,7 +8,15 @@ on:
 
 jobs:
   checks:
+    name: checks (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # The supported range is engines >=22: the oldest supported LTS, the
+        # development default from .nvmrc, and the newest release.
+        node-version: [22, 24, latest]
 
     steps:
       - name: Checkout
@@ -17,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
