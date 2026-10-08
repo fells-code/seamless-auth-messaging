@@ -22,12 +22,12 @@
     "typecheck": "tsc -b --pretty false",
     "clean": "rm -rf packages/*/dist packages/*/tsconfig.tsbuildinfo",
     "release:verify": "npm run lint && npm run format:check && npm run typecheck && npm test",
-    "publish:core": "npm publish --workspace packages/core --access public",
-    "publish:aws": "npm publish --workspace packages/aws --access public",
-    "publish:twilio": "npm publish --workspace packages/twilio --access public",
-    "publish:packages": "npm run publish:core && npm run publish:aws && npm run publish:twilio"
+    "changeset": "changeset",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
+    "release": "npm run release:verify && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^10.0.1",
     "@types/node": "^24.8.1",
     "eslint": "^10.2.1",

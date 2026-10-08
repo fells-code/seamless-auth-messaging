@@ -185,28 +185,15 @@ npm run lint:fix
 
 ## Publishing
 
-Publish manually after verification:
+Releases go through [changesets](https://github.com/changesets/changesets), as in the other
+seamless-\* repos. Do not publish or tag by hand.
 
-```bash
-npm run release:verify
-npm run publish:core
-npm run publish:aws
-npm run publish:twilio
-```
+1. A pull request that changes what adopters get adds a changeset (`npx changeset`). Its summary
+   is the release note.
+2. On merge, the release workflow opens or updates the `chore: version packages` pull request,
+   which bumps the versions and the package changelogs.
+3. Merging that pull request runs `npm run release:verify`, publishes to npm with provenance,
+   tags each package and creates the GitHub releases.
 
-The repo also includes GitHub Actions publish automation for GitHub Releases.
-
-The release tag must match the package version, for example:
-
-- `v0.1.0`
-- `0.1.0`
-
-Required GitHub secret:
-
-- `NPM_TOKEN`
-
-Publish order:
-
-1. `@seamless-auth/messaging`
-2. `@seamless-auth/messaging-aws`
-3. `@seamless-auth/messaging-twilio`
+The three packages are a fixed group: they always share one version, and the transports depend
+on the matching `@seamless-auth/messaging`. Publishing needs the `NPM_TOKEN` secret.
