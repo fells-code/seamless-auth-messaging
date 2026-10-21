@@ -197,3 +197,11 @@ seamless-\* repos. Do not publish or tag by hand.
 
 The three packages are a fixed group: they always share one version, and the transports depend
 on the matching `@seamless-auth/messaging`. Publishing needs the `NPM_TOKEN` secret.
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).
+
+Project governance, including the
+[Seamless Auth License Pledge](https://github.com/fells-code/.github/blob/main/GOVERNANCE.md#the-seamless-auth-license-pledge),
+is in the fells-code [GOVERNANCE.md](https://github.com/fells-code/.github/blob/main/GOVERNANCE.md).
