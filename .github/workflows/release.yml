@@ -19,6 +19,7 @@ jobs:
     name: Version or publish
     if: github.repository == 'fells-code/seamless-auth-messaging'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     permissions:
       contents: write

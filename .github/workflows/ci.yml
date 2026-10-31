@@ -4,12 +4,33 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "*.md"
+      - docs/**
+      - examples/**/*.md
+      - packages/*/README.md
+      - LICENSE
+      - packages/*/LICENSE
+      - .github/ISSUE_TEMPLATE/**
   pull_request:
+    paths-ignore:
+      - "*.md"
+      - docs/**
+      - examples/**/*.md
+      - packages/*/README.md
+      - LICENSE
+      - packages/*/LICENSE
+      - .github/ISSUE_TEMPLATE/**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   checks:
     name: checks (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
