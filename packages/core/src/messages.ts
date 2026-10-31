@@ -1,23 +1,9 @@
-export interface SendOtpEmailInput {
-  to: string;
-  token: string;
-  from?: string;
-  subject?: string;
-}
-
-export interface SendOtpSmsInput {
-  to: string;
-  token: string | number;
-  from?: string;
-}
-
-export interface SendMagicLinkEmailInput {
-  to: string;
-  magicLinkUrl: string;
-  token?: string;
-  from?: string;
-  subject?: string;
-}
+export type {
+  AuthDeliveryInstruction,
+  SendMagicLinkEmailInput,
+  SendOtpEmailInput,
+  SendOtpSmsInput,
+} from "@seamless-auth/types";
 
 /**
  * Asks a user to sign in and add a passkey, for example after their account was
