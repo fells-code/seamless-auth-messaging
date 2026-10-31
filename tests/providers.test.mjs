@@ -30,10 +30,63 @@ test("AWS SES provider sends normalized email payloads", async () => {
   assert.equal(result.provider, "aws-ses");
   assert.equal(result.channel, "email");
   assert.equal(result.messageId, "ses-123");
-  assert.equal(capturedCommand.input.Source, "noreply@example.com");
+  assert.equal(capturedCommand.input.FromEmailAddress, "noreply@example.com");
   assert.deepEqual(capturedCommand.input.Destination.ToAddresses, ["user@example.com"]);
-  assert.equal(capturedCommand.input.Message.Subject.Data, "Verify your email");
-  assert.equal(capturedCommand.input.Message.Body.Text.Data, "Code: ABCDEF");
+  assert.equal(capturedCommand.input.Content.Simple.Subject.Data, "Verify your email");
+  assert.equal(capturedCommand.input.Content.Simple.Body.Text.Data, "Code: ABCDEF");
+  assert.equal(capturedCommand.input.Content.Simple.Headers, undefined);
+});
+
+test("AWS SES provider passes custom headers through", async () => {
+  let capturedCommand;
+
+  const provider = createAwsEmailTransport({
+    region: "us-east-1",
+    fromEmail: "noreply@example.com",
+    sesClient: {
+      async send(command) {
+        capturedCommand = command;
+        return { MessageId: "ses-456" };
+      },
+    },
+  });
+
+  await provider.send({
+    to: "user@example.com",
+    subject: "What's new",
+    text: "A note.",
+    headers: {
+      "List-Unsubscribe": "<https://api.example.com/unsubscribe/abc>",
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    },
+  });
+
+  assert.deepEqual(capturedCommand.input.Content.Simple.Headers, [
+    { Name: "List-Unsubscribe", Value: "<https://api.example.com/unsubscribe/abc>" },
+    { Name: "List-Unsubscribe-Post", Value: "List-Unsubscribe=One-Click" },
+  ]);
+});
+
+test("AWS SES provider refuses headers that would inject or collide", async () => {
+  const provider = createAwsEmailTransport({
+    region: "us-east-1",
+    fromEmail: "noreply@example.com",
+    sesClient: {
+      async send() {
+        throw new Error("should not be sent");
+      },
+    },
+  });
+  const base = { to: "user@example.com", subject: "Hi", text: "Hello" };
+
+  for (const headers of [
+    { "List-Unsubscribe": "<https://a.example>\r\nBcc: x@example.com" },
+    { "Bad Name": "value" },
+    { Subject: "Another subject" },
+    { "X-Empty": " " },
+  ]) {
+    await assert.rejects(provider.send({ ...base, headers }), { code: "INVALID_INPUT" });
+  }
 });
 
 test("AWS SNS provider sends SMS with sender ID when configured", async () => {
@@ -149,7 +202,7 @@ test("Mixed provider composition works for SES email plus Twilio SMS", async () 
   assert.equal(smsResult.provider, "twilio");
   assert.equal(deliveries[0].type, "email");
   assert.equal(deliveries[1].type, "sms");
-  assert.match(deliveries[0].input.Message.Subject.Data, /sign-in link/i);
+  assert.match(deliveries[0].input.Content.Simple.Subject.Data, /sign-in link/i);
   assert.match(deliveries[1].input.body, /123456/);
 });
 
@@ -287,9 +340,12 @@ test("Enrollment invites link to the sign-in page", async () => {
   });
 
   assert.equal(result.provider, "aws-ses");
-  assert.match(delivered[0].Message.Subject.Data, /add a passkey/i);
-  assert.match(delivered[0].Message.Body.Text.Data, /https:\/\/app\.example\.com\/login/);
-  assert.match(delivered[0].Message.Body.Html.Data, /href="https:\/\/app\.example\.com\/login"/);
+  assert.match(delivered[0].Content.Simple.Subject.Data, /add a passkey/i);
+  assert.match(delivered[0].Content.Simple.Body.Text.Data, /https:\/\/app\.example\.com\/login/);
+  assert.match(
+    delivered[0].Content.Simple.Body.Html.Data,
+    /href="https:\/\/app\.example\.com\/login"/,
+  );
 });
 
 test("Enrollment invites honour a custom handler and an override", async () => {
@@ -323,7 +379,10 @@ test("Enrollment invites honour a custom handler and an override", async () => {
     to: "user@example.com",
     signInUrl: "https://app.example.com/login",
   });
-  assert.equal(delivered[0].Message.Subject.Data, "[Seamless Demo] passkeys for user@example.com");
+  assert.equal(
+    delivered[0].Content.Simple.Subject.Data,
+    "[Seamless Demo] passkeys for user@example.com",
+  );
 });
 
 test("Enrollment invites reject a sign-in URL that is not a URL", async () => {

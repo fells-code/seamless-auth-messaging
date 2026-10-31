@@ -6,10 +6,10 @@ import {
 } from "@aws-sdk/client-sns";
 import {
   SendEmailCommand,
-  SESClient,
+  SESv2Client,
   type SendEmailCommandOutput,
   type SendEmailCommandInput,
-} from "@aws-sdk/client-ses";
+} from "@aws-sdk/client-sesv2";
 import type {
   DeliveryResult,
   EmailMessage,
@@ -56,35 +56,45 @@ class AwsSesEmailTransport implements EmailTransport {
     assertNonEmptyString(config.fromEmail, "config.fromEmail");
     assertLikelyEmail(config.fromEmail, "config.fromEmail");
     this.config = config;
-    this.client = config.sesClient ?? new SESClient({ region: config.region });
+    this.client = config.sesClient ?? new SESv2Client({ region: config.region });
   }
 
   async send(message: EmailMessage): Promise<DeliveryResult> {
     assertEmailMessage(message);
 
+    const headers = Object.entries(message.headers ?? {}).map(([Name, Value]) => ({
+      Name,
+      Value,
+    }));
+
+    // SES v2, because the v1 SendEmail call has no way to carry custom headers.
+    // Simple content is still authorised by ses:SendEmail, as before.
     const input: SendEmailCommandInput = {
-      Source: message.from ?? this.config.fromEmail,
+      FromEmailAddress: message.from ?? this.config.fromEmail,
       Destination: {
         ToAddresses: [message.to],
       },
-      Message: {
-        Subject: {
-          Charset: "UTF-8",
-          Data: message.subject,
-        },
-        Body: {
-          ...(message.html
-            ? {
-                Html: {
-                  Charset: "UTF-8",
-                  Data: message.html,
-                },
-              }
-            : {}),
-          Text: {
+      Content: {
+        Simple: {
+          Subject: {
             Charset: "UTF-8",
-            Data: message.text,
+            Data: message.subject,
           },
+          Body: {
+            ...(message.html
+              ? {
+                  Html: {
+                    Charset: "UTF-8",
+                    Data: message.html,
+                  },
+                }
+              : {}),
+            Text: {
+              Charset: "UTF-8",
+              Data: message.text,
+            },
+          },
+          ...(headers.length > 0 ? { Headers: headers } : {}),
         },
       },
     };

@@ -14,6 +14,12 @@ export interface EmailMessage {
   subject: string;
   text: string;
   html?: string;
+  /**
+   * Extra headers to send with the message, such as `List-Unsubscribe`. Names
+   * and values are passed through as given; a transport that cannot send
+   * custom headers ignores them.
+   */
+  headers?: Record<string, string>;
 }
 
 export interface SmsMessage {

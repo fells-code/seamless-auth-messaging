@@ -48,6 +48,45 @@ export function assertEmailMessage(message: EmailMessage): void {
   if (message.html !== undefined) {
     assertNonEmptyString(message.html, "message.html");
   }
+
+  if (message.headers !== undefined) {
+    assertEmailHeaders(message.headers);
+  }
+}
+
+// RFC 5322 field names are printable ASCII without a colon. A line break in
+// either part would let a caller inject further headers, or a body.
+const HEADER_NAME = /^[!-9;-~]+$/;
+const LINE_BREAK = /[\r\n]/;
+
+// Set by the transport from the message's own fields, so a header naming one
+// would be a second, conflicting copy.
+const RESERVED_HEADERS = new Set(["from", "to", "cc", "bcc", "subject", "content-type"]);
+
+export function assertEmailHeaders(headers: Record<string, string>): void {
+  if (typeof headers !== "object" || headers === null || Array.isArray(headers)) {
+    throw new MessagingError("INVALID_INPUT", `"message.headers" must be an object.`);
+  }
+
+  for (const [name, value] of Object.entries(headers)) {
+    if (!HEADER_NAME.test(name)) {
+      throw new MessagingError("INVALID_INPUT", `"${name}" is not a valid header name.`);
+    }
+
+    if (RESERVED_HEADERS.has(name.toLowerCase())) {
+      throw new MessagingError(
+        "INVALID_INPUT",
+        `"${name}" is set from the message itself and cannot be passed as a header.`,
+      );
+    }
+
+    if (typeof value !== "string" || value.trim().length === 0 || LINE_BREAK.test(value)) {
+      throw new MessagingError(
+        "INVALID_INPUT",
+        `The "${name}" header must be a non-empty string on a single line.`,
+      );
+    }
+  }
 }
 
 export function assertSmsMessage(message: SmsMessage): void {
