@@ -1,6 +1,6 @@
 {
   "name": "@seamless-auth/messaging-twilio",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Twilio SMS adapter for SeamlessAuth messaging",
   "license": "Apache-2.0",
   "author": "Fells Code, LLC",
@@ -31,7 +31,7 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@seamless-auth/messaging": "^0.3.0",
+    "@seamless-auth/messaging": "^0.3.1",
     "twilio": "^5.10.4"
   },
   "publishConfig": {

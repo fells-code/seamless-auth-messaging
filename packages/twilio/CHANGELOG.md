@@ -1,5 +1,12 @@
 # @seamless-auth/messaging-twilio
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [4e19974]
+  - @seamless-auth/messaging@0.3.1
+
 ## 0.3.0
 
 ### Patch Changes
