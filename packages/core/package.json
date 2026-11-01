@@ -4,6 +4,11 @@
   "description": "Provider-agnostic messaging core for SeamlessAuth",
   "license": "Apache-2.0",
   "author": "Fells Code, LLC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fells-code/seamless-auth-messaging.git",
+    "directory": "packages/core"
+  },
   "sideEffects": false,
   "type": "module",
   "main": "./dist/index.js",
